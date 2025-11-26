@@ -1,11 +1,32 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import inspect
+
+
+# =========================================================
+# ★★ 评估指标函数（R²、MAE、RMSE）还有一个SHAP可解释性函数★★
+# =========================================================
+def evaluate_model(model, X_test, y_test, target_name):
+    y_pred = model.predict(X_test)
+
+    # 指标
+    r2 = r2_score(y_test, y_pred)
+    mae = mean_absolute_error(y_test, y_pred)
+    rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+    print(f"\n===== {target_name} 模型评估结果 =====")
+    print(f"R² Score : {r2:.4f}")
+    print(f"MAE      : {mae:.4f}")
+    print(f"RMSE     : {rmse:.4f}")
+
+    return r2, mae, rmse
 
 # =========================================================
 # ★★ 函数：根据不同 sheet 训练对应目标的模型 ★★
@@ -100,10 +121,11 @@ def train_model_for_target(sheet_name, target_col):
     # 10. 训练
     model.fit(X_train, y_train)
 
+    evaluate_model(model, X_test, y_test, target_col)#模型评估
+
     print(f"\n模型训练完成：{target_col}（Sheet: {sheet_name}）")
 
     return model, X_test, y_test
-
 
 # =========================================================
 # ★★ 使用示例（你需要哪个模型就训练哪个）★★
